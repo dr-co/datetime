@@ -8,6 +8,9 @@ our $VERSION = '0.01';
 use Carp;
 
 use Data::Dumper;
+use POSIX ();
+use Time::Local ();
+use Time::Zone ();
 
 sub new {
     my ($self, $stamp, $tz) = @_;
@@ -24,6 +27,44 @@ sub new {
     }
 
     bless [ $stamp, $tz // () ] => ref($self) || $self;
+}
+
+sub parse {
+    my ($class, $str) = @_;
+    return undef unless defined $str;
+    my ($y, $m, $d, $H, $M, $S, $z);
+
+    for ($str) {
+        if (/^(\d{4})-(\d{2})-(\d{2})(?:\s+|T)(\d{2}):(\d{2}):(\d{2})\s*([+-]?(?:\d{2}|\d{4}))?$/) {
+            ($y, $m, $d, $H, $M, $S, $z) = ($1, $2, $3, $4, $5, $6, $7 // '+0000');
+            goto PARSED;
+        }
+        
+        if (/^(\d{4})-(\d{2})-(\d{2})(?:\s+|T)(\d{2}):(\d{2})?$/) {
+            ($y, $m, $d, $H, $M, $S, $z) = ($1, $2, $3, $4, $5, 0, '+0000');
+            goto PARSED;
+        }
+
+        return undef;
+    }
+
+
+    PARSED:
+        for ($m) {
+            s/^0//;
+            $_--;
+        }
+        for ($d, $H, $M, $S) {
+            s/^0//;
+        }
+        $y -= 1900;
+        my $stamp = eval {
+            local $SIG{__DIE__} = sub {}; # Ick!
+            Time::Local::timegm($S,$M,$H,$d,$m,$y);
+        };
+
+        my $offset = Time::Zone::tz_offset($z);
+        $class->new($stamp - $offset, $z);
 }
 
 sub epoch   { shift->[0] }
