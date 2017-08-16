@@ -11,6 +11,7 @@ use Data::Dumper;
 use POSIX ();
 use Time::Local ();
 use Time::Zone ();
+use feature 'state';
 
 sub new {
     my ($self, $stamp, $tz) = @_;
@@ -30,18 +31,41 @@ sub new {
 }
 
 sub parse {
-    my ($class, $str) = @_;
+    my ($class, $str, $default_tz) = @_;
     return undef unless defined $str;
-    my ($y, $m, $d, $H, $M, $S, $z);
+    my ($y, $m, $d, $H, $M, $S, $ns, $z);
 
     for ($str) {
-        if (/^(\d{4})-(\d{2})-(\d{2})(?:\s+|T)(\d{2}):(\d{2}):(\d{2})\s*([+-]?(?:\d{2}|\d{4}))?$/) {
-            ($y, $m, $d, $H, $M, $S, $z) = ($1, $2, $3, $4, $5, $6, $7 // '+0000');
+        if (/^(\d{4})-(\d{2})-(\d{2})(?:\s+|T)(\d{2}):(\d{2}):(\d{2})(\.\d+)?\s*(\S+)?$/) {
+            ($y, $m, $d, $H, $M, $S, $ns, $z) =
+                ($1, $2, $3, $4, $5, $6, $7, $8);
+            for ($z) {
+                next unless defined $z;
+                if (/^[+-]\d{1,4}/) {
+                    s/^([+-])(\d|\d{3})$/${1}0$2/;
+                    s/^([+-])(\d{2})$/${1}${2}00/;
+                } else {
+                    die "Wrong time zone format: '$z'";
+                }
+            }
             goto PARSED;
         }
         
-        if (/^(\d{4})-(\d{2})-(\d{2})(?:\s+|T)(\d{2}):(\d{2})?$/) {
-            ($y, $m, $d, $H, $M, $S, $z) = ($1, $2, $3, $4, $5, 0, '+0000');
+        if (/^(\d{4})-(\d{2})-(\d{2})(?:\s+|T)(\d{2}):(\d{2})$/) {
+            ($y, $m, $d, $H, $M, $S, $ns, $z) =
+                ($1, $2, $3, $4, $5, 0, 0, undef);
+            goto PARSED;
+        }
+        
+        if (/^(\d{4})-(\d{2})-(\d{2})$/) {
+            ($y, $m, $d, $H, $M, $S, $ns, $z) =
+                ($1, $2, $3, 0, 0, 0, 0, undef);
+            goto PARSED;
+        }
+
+        if (/^(\d{1,2})\.(\d{1,2})\.(\d{4})\s+(\d{2}):(\d{2}):(\d{2})(\.\d+)\s*(\S+)?$/) {
+            ($y, $m, $d, $H, $M, $S, $ns, $z) =
+                ($3, $2, $1, $4, $5, $6, $7, $8);
             goto PARSED;
         }
 
@@ -50,6 +74,8 @@ sub parse {
 
 
     PARSED:
+
+        $z //= $default_tz // '+0000';
         for ($m) {
             s/^0//;
             $_--;
@@ -58,17 +84,47 @@ sub parse {
             s/^0//;
         }
         $y -= 1900;
+
+        $ns //= 0;
         my $stamp = eval {
             local $SIG{__DIE__} = sub {}; # Ick!
             Time::Local::timegm($S,$M,$H,$d,$m,$y);
         };
+        $stamp += $ns;
 
-        my $offset = Time::Zone::tz_offset($z);
+        my $offset = Time::Zone::tz_offset($z, $stamp);
         $class->new($stamp - $offset, $z);
 }
 
 sub epoch   { shift->[0] }
 sub tz      { shift->[1] // $DR::DateTime::Defaults::TZ }
+
+sub strftime :method {
+    my ($self, $format) = @_;
+    croak 'Invalid format' unless $format;
+    my $offset = Time::Zone::tz_offset($self->tz, $self->epoch);
+    my $stamp = $self->epoch + $offset;
+
+    state $patterns;
+    unless ($patterns) {
+        $patterns = {
+            '%'     => sub { '%' },
+            'z'     => sub { shift->tz },
+            'Z'     => sub { shift->tz },
+            'N'     => sub {
+                int(1_000_000_000 * (abs($_[1]) - POSIX::floor(abs $_[1]))) }
+
+        };
+        for my $sp (qw(a A b B c d H I j m M p S U w W x X y Y D F T h)) {
+            $patterns->{$sp} = sub { POSIX::strftime "%$sp", gmtime $_[1] }
+        }
+    }
+
+    $format =~ s{%([a-zA-Z%])}
+        { $patterns->{$1} ? $patterns->{$1}->($self, $stamp) : "%$1" }sgex;
+
+    $format;
+}
 
 1;
 __END__
