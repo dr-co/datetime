@@ -1,6 +1,10 @@
+.gitignore
 Changes
-Makefile.PL
 MANIFEST
+Makefile.PL
 README
-t/DR-DateTime.t
 lib/DR/DateTime.pm
+lib/DR/DateTime/Defaults.pm
+t/010-base.t
+t/020-parse.t
+t/030-add.t
