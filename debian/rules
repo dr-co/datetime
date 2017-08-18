@@ -18,7 +18,7 @@ install/libdr-datetime-perl::
 clean::
 	rm -f Makefile.old	
 	rm -fr .pc
-	rm -f DR-R-*.tar.gz*
+	rm -f DR-DateTime-*.tar*
 
 manifest: clean
 	find -type f | grep -v '^./\.git'|sed 's/^..//' | sort -u > MANIFEST
