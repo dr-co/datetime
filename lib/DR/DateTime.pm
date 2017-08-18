@@ -4,7 +4,7 @@ use DR::DateTime::Defaults;
 use 5.010001;
 use strict;
 use warnings;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 use Carp;
 
 use Data::Dumper ();
@@ -349,6 +349,28 @@ sub clone {
     bless [ @$self ] => ref($self) || $self;
 }
 
+sub set_time_zone {
+    my ($self, $tz) = @_;
+    if (defined $tz) {
+        for ($tz) {
+            s/^\d{1,4}$/+$&/;
+            s/^([+-])(\d)$/${1}0${2}00/;
+            s/^([+-]\d{2})$/${1}00/;
+            s/^([+-])(\d{3})$/${1}0$2/;
+        }
+
+        if ($tz eq 'local') {
+            $tz = undef;
+        } elsif ($tz !~ /^[+-]\d{4}$/) {
+            croak "Wrong time zone: '$tz'";
+        }
+    }
+    $self->[1] = $tz;
+    $self;
+}
+
+sub set_tz { goto \&set_time_zone }
+
 1;
 
 __END__
@@ -482,6 +504,10 @@ Retrun timestamp value.
 =head3 hires_epoch or fepoch
 
 Return timestamp that includes nanoseconds as float value.
+
+=head3 set_time_zone($tz)
+
+Set timezone for the following L</strftime> calls.
 
 =head3 clone
 

@@ -1,3 +1,9 @@
+libdr-datetime-perl (0.03) nowtaxi; urgency=medium
+
+  * Add set_time_zone method.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Fri, 18 Aug 2017 15:26:16 +0300
+
 libdr-datetime-perl (0.02) nowtaxi; urgency=medium
 
   * Add overload methods.
