@@ -4,7 +4,7 @@ use DR::DateTime::Defaults;
 use 5.010001;
 use strict;
 use warnings;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 use Carp;
 
 use Data::Dumper ();
@@ -12,6 +12,31 @@ use POSIX ();
 use Time::Local ();
 use Time::Zone ();
 use feature 'state';
+
+use overload
+        'bool'      => sub { 1 },
+        '""'        => sub { shift->strftime('%F %T%z') },
+        '<=>'       => sub {
+            my ($self, $cv, $flip) = @_;
+            if ('DR::DateTime' eq ref $cv) {
+                return $self->fepoch <=> $cv->fepoch;
+            }
+            return $self->fepoch <=> $cv->fepoch;
+        },
+
+        'cmp'       => sub {
+            my ($self, $cv, $flip) = @_;
+            if ('DR::DateTime' eq ref $cv) {
+                return $self->strftime('%F %T%z') cmp $cv->strftime('%F %T%z');
+            }
+            my $pct = $self->parse($cv);
+            return $self->strftime('%F %T%z') cmp $cv unless $pct;
+            return $self->strftime('%F %T%z') cmp $pct->strftime('%F %T%z');
+        },
+
+        int         => sub { shift->epoch }
+;
+
 
 sub new {
     my ($self, $stamp, $tz) = @_;

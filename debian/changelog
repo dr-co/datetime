@@ -1,3 +1,9 @@
+libdr-datetime-perl (0.02) nowtaxi; urgency=medium
+
+  * Add overload methods.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Fri, 18 Aug 2017 14:30:45 +0300
+
 libdr-datetime-perl (0.01) nowtaxi; urgency=low
 
   * Init debian package.
