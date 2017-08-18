@@ -6,7 +6,7 @@ use utf8;
 use open qw(:std :utf8);
 use lib qw(lib ../lib t/lib);
 
-use Test::More tests    => 60;
+use Test::More tests    => 66;
 use Encode qw(decode encode);
 
 
@@ -129,4 +129,16 @@ for my $t (DR::DateTime->parse('2017-08-17 10:34:58.5+07')) {
     is $t->ymd('/'), '2017/08/17', 'ymd';
 
     is $t->time_zone, $t->tz, 'time_zone';
+}
+
+for my $t (DR::DateTime->parse('2017-08-17 10:34')) {
+    isa_ok $t => DR::DateTime::, 'parsed wo second';
+    is $t->hour, 10, 'hour';
+    is $t->minute, 34, 'minute';
+}
+
+for my $t (DR::DateTime->parse('2017-08-17')) {
+    isa_ok $t => DR::DateTime::, 'parsed wo second';
+    is $t->hour, 0, 'hour';
+    is $t->minute, 0, 'minute';
 }
