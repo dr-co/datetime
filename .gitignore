@@ -3,3 +3,4 @@ MYMETA.*
 blib
 pm_to_blib
 debian/*
+DR-DateTime-*.tar.gz
