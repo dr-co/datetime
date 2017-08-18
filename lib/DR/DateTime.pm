@@ -273,6 +273,50 @@ sub subtract {
     $self->add(%sub);
 }
 
+sub truncate {
+    my ($self, %opts) = @_;
+
+    my $to = $opts{to} // 'second';
+
+    my $str;
+    if ($to eq 'second') {
+        $str = $self->strftime('%F %H:%M:%S%z');
+        goto PARSE;
+        return;
+    }
+
+    if ($to eq 'minute') {
+        $str = $self->strftime('%F %H:%M:00%z');
+        goto PARSE;
+    }
+
+    if ($to eq 'hour') {
+        $str = $self->strftime('%F %H:00:00%z');
+        goto PARSE;
+    }
+    
+    if ($to eq 'day') {
+        $str = $self->strftime('%F 00:00:00%z');
+        goto PARSE;
+    }
+
+    if ($to eq 'month') {
+        $str = $self->strftime('%Y-%m-01 00:00:00%z');
+        goto PARSE;
+    }
+    
+    if ($to eq 'year') {
+        $str = $self->strftime('%Y-01-01 00:00:00%z');
+        goto PARSE;
+    }
+
+    croak "Can not truncate the datetime to '$to'";
+
+    PARSE:
+        $self->[0] = $self->parse($str)->epoch;
+        $self;
+}
+
 1;
 __END__
 # Below is stub documentation for your module. You'd better edit it!
