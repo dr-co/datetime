@@ -27,6 +27,9 @@ sub new {
                 $3 // '00';
     }
 
+    $tz = $DR::DateTime::Defaults::TZFORCE
+        if defined $DR::DateTime::Defaults::TZFORCE;
+
     bless [ $stamp, $tz // () ] => ref($self) || $self;
 }
 
@@ -38,25 +41,25 @@ sub parse {
     for ($str) {
         if (/^(\d{4})-(\d{2})-(\d{2})(?:\s+|T)(\d{2}):(\d{2}):(\d{2})(\.\d+)?\s*(\S+)?$/) {
             ($y, $m, $d, $H, $M, $S, $ns, $z) =
-                ($1, $2, $3, $4, $5, $6, $7, $8 // '+0000');
+                ($1, $2, $3, $4, $5, $6, $7, $8);
             goto PARSED;
         }
         
         if (/^(\d{4})-(\d{2})-(\d{2})(?:\s+|T)(\d{2}):(\d{2})$/) {
             ($y, $m, $d, $H, $M, $S, $ns, $z) =
-                ($1, $2, $3, $4, $5, 0, 0, '+0000');
+                ($1, $2, $3, $4, $5, 0, 0, undef);
             goto PARSED;
         }
         
         if (/^(\d{4})-(\d{2})-(\d{2})$/) {
             ($y, $m, $d, $H, $M, $S, $ns, $z) =
-                ($1, $2, $3, 0, 0, 0, 0, '+0000');
+                ($1, $2, $3, 0, 0, 0, 0, undef);
             goto PARSED;
         }
 
         if (/^(\d{1,2})\.(\d{1,2})\.(\d{4})\s+(\d{2}):(\d{2}):(\d{2})(\.\d+)\s*(\S+)?$/) {
             ($y, $m, $d, $H, $M, $S, $ns, $z) =
-                ($3, $2, $1, $4, $5, $6, $7, $8 // '+0000');
+                ($3, $2, $1, $4, $5, $6, $7, $8);
             goto PARSED;
         }
 
@@ -66,7 +69,7 @@ sub parse {
 
     PARSED:
 
-        $z //= $default_tz // $DR::DateTime::Defaults::TZ;
+        $z //= $default_tz // '+0000';
         for ($z) {
             if (/^[+-]\d{1,4}$/) {
                 s/^([+-])(\d|\d{3})$/${1}0$2/;
@@ -278,13 +281,12 @@ sub truncate {
 
     my $to = $opts{to} // 'second';
 
-    my $str;
     if ($to eq 'second') {
-        $str = $self->strftime('%F %H:%M:%S%z');
-        goto PARSE;
-        return;
+        $self->[0] = $self->epoch;
+        return $self;
     }
 
+    my $str;
     if ($to eq 'minute') {
         $str = $self->strftime('%F %H:%M:00%z');
         goto PARSE;
@@ -318,54 +320,151 @@ sub truncate {
 }
 
 1;
+
 __END__
-# Below is stub documentation for your module. You'd better edit it!
 
 =head1 NAME
 
-DR::DateTime - Perl extension for blah blah blah
+DR::DateTime - Easy DateTime implementator.
 
 =head1 SYNOPSIS
 
   use DR::DateTime;
-  blah blah blah
+  my $t = new DR::DateTime time;
+  my $t = new DR::DateTime time, '+0300';
+
+  my $t = parse DR::DateTime '2017-08-18 12:33:19.1234+0300';
+
+  $t->year;
+  $t->month;
+  $t->day;
+  $t->day_of_week;
+  $t->hour;
+  $t->minute;
+  $t->second;
+  $t->nanosecond;
+
+  $t->add(second => 15, hour => 24, month => 17);
+  $t->subtract(year => 7);
 
 =head1 DESCRIPTION
 
-Stub documentation for DR::DateTime, created by h2xs. It looks like the
-author of the extension was negligent enough to leave the stub
-unedited.
+The module provide the same (reduced) API as L<DateTime>.
 
-Blah blah blah.
+L<DateTime> is a very usable and good module, but Dump of its objects gets two
+or three screens, so If You use more than one object L<DateTime> You have too
+many troubles to debug Your code.
 
-=head2 EXPORT
+=head2 METHODS
 
-None by default.
+=head3 new([$timestamp[,$timezone]])
+
+Create L<DR::DateTime> instance. If C<$timezone> is not defined,
+the module will use C<$DR::DateTime::Defaults::TZ> value.
+
+C<$timezone> is used only for L</strftime> method.
+
+=head3 parse($str[, $default_timezone])
+
+Default value for C<$default_timezone> is C<'+0000'> (C<UTC>).
+
+Parse string and creates and object (or return C<undef>).
+
+The module can parse only standard time format like (may be partly incompleted)
+C<%F %T.%N %z> (see man strftime).
 
 
+=head3 strftime($format)
+
+Method that works like L<POSIX/strftime>. The method has one additional
+placeholder - C<%N> - nanosecond.
+
+
+=head3 nanosecond, second, etc
+
+Methods that return part of contained date. Allow:
+
+=over
+
+=item nanosecond
+
+=item second
+
+=item minute
+
+=item hour
+
+=item day
+
+=item day_of_week (C<< $t->strftime('%u') >>)
+
+=item month
+
+=item year
+
+=back
+
+
+=head3 truncate(to => ...)
+
+This method allows You to reset some of the local time components in the
+object to their "zero" values. The "to" parameter is used to specify which
+values to truncate, and it may be one of C<year>, C<month>, C<day>,
+C<hour>, C<minute>, or C<second>.
+
+
+=head3 add(...), substract(...)
+
+These methods allow You add or substract values to object.
+
+    $t
+        -> add(
+            year        => 1,
+            month       => 2,
+            day         => 4,
+            hour        => 17,
+            minute      => 18,
+            second      => 19,
+            nanosecond  => 50001
+        )
+        -> subtract(
+            year        => 3,
+            month       => 4,
+            day         => 5,
+            hour        => 22,
+            minute      => 23,
+            second      => 24,
+            nanosecond  => 7829
+        );
+        
+
+=head3 time_zone or tz
+
+Return timezone that is used for L<strftime> method.
+
+Now L<DR::DateTime> uses only one time zone format: C<qr/^[+-]\d{2,4}$/>.
+Named time zones are not supported yet.
 
 =head1 SEE ALSO
 
-Mention other useful documentation such as the documentation of
-related modules or operating system documentation (such as man pages
-in UNIX), or any relevant external documentation such as RFCs or
-standards.
+=over
 
-If you have a mailing list set up for your module, mention it here.
+=item man strftime
 
-If you have a web site set up for your module, mention it here.
+=item L<POSIX/strftime>
+
+=back
 
 =head1 AUTHOR
 
-Dmitry E. Oboukhov, E<lt>unera@E<gt>
+Dmitry E. Oboukhov, E<lt>unera@debian.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
 Copyright (C) 2017 by Dmitry E. Oboukhov
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.24.1 or,
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
 at your option, any later version of Perl 5 you may have available.
-
 
 =cut
