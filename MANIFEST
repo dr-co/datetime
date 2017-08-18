@@ -3,6 +3,13 @@ Changes
 MANIFEST
 Makefile.PL
 README
+debian/changelog
+debian/compat
+debian/control
+debian/copyright
+debian/rules
+debian/source/format
+debian/source/options
 lib/DR/DateTime.pm
 lib/DR/DateTime/Defaults.pm
 lib/DR/DateTime/MouseType.pm
