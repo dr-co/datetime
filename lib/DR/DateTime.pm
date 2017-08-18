@@ -319,6 +319,11 @@ sub truncate {
         $self;
 }
 
+sub clone {
+    my ($self) = @_;
+    bless [ @$self ] => ref($self) || $self;
+}
+
 1;
 
 __END__
@@ -444,6 +449,18 @@ Return timezone that is used for L<strftime> method.
 
 Now L<DR::DateTime> uses only one time zone format: C<qr/^[+-]\d{2,4}$/>.
 Named time zones are not supported yet.
+
+=head3 epoch
+
+Retrun timestamp value.
+
+=head3 hires_epoch or fepoch
+
+Return timestamp that includes nanoseconds as float value.
+
+=head3 clone
+
+Clone the value.
 
 =head1 SEE ALSO
 

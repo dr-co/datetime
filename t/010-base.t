@@ -6,7 +6,7 @@ use utf8;
 use open qw(:std :utf8);
 use lib qw(lib ../lib t/lib);
 
-use Test::More tests    => 15;
+use Test::More tests    => 16;
 use Encode qw(decode encode);
 
 
@@ -44,4 +44,6 @@ for my $now (DR::DateTime->new(undef, '+27')) {
 }
 for my $now (DR::DateTime->new(undef, '-2732')) {
     is $now->tz, '-2732', 'tz';
+
+    is_deeply $now->clone, $now, 'clone';
 }
