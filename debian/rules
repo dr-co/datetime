@@ -3,7 +3,7 @@
 include /usr/share/cdbs/1/rules/debhelper.mk
 include /usr/share/cdbs/1/class/perl-makemaker.mk
 
-MAIN_MODULE	= lib/DR/R.pm
+MAIN_MODULE	= lib/DR/DateTime.pm
 
 DEBVERSION = $(shell dpkg-parsechangelog \
 	|grep ^Version|awk '{print $$2}'|sed 's/-.*//' )
