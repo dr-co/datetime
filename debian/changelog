@@ -1,3 +1,9 @@
+libdr-datetime-perl (0.08) nowtaxi; urgency=medium
+
+  * Overload '+', '-' operations. 
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Mon, 21 Aug 2017 21:42:20 +0300
+
 libdr-datetime-perl (0.07) nowtaxi; urgency=medium
 
   * Overload cmp, <=> with numeric and string work properly.

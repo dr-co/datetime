@@ -4,7 +4,7 @@ use DR::DateTime::Defaults;
 use 5.010001;
 use strict;
 use warnings;
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 use Carp;
 
 use POSIX ();
@@ -33,7 +33,39 @@ use overload
             return $self->strftime('%F %T%z') cmp $pct->strftime('%F %T%z');
         },
 
-        int         => sub { shift->epoch }
+        int         => sub { shift->epoch },
+
+        '+'         => sub {
+            my ($self, $cv, $flip) = @_;
+            if ('DR::DateTime' eq ref $cv) {
+                return $self->new(
+                    $self->fepoch + $cv->fepoch,
+                    $self->[1]
+                )
+            }
+
+            $self->new(
+                $self->fepoch + $cv,
+                $self->[1]
+            )
+        },
+
+        '-'         => sub {
+            my ($self, $cv, $flip) = @_;
+            warn "$self $cv $flip";
+
+            if ($flip) {
+                if ('DR::DateTime' eq ref $cv) {
+                    return $cv->fepoch - $self->fepoch;
+                }
+                return $cv - $self->fepoch;
+            } else {
+                if ('DR::DateTime' eq ref $cv) { # date1 - $date2
+                    return $self->fepoch - $cv->fepoch;
+                }
+                return $self->new($self->fepoch - $cv, $self->[1]);
+            }
+        }
 ;
 
 
