@@ -14,6 +14,7 @@ debian/source/options
 lib/DR/DateTime.pm
 lib/DR/DateTime/Defaults.pm
 lib/DR/DateTime/MouseType.pm
+t/000-depends.t
 t/010-base.t
 t/020-parse.t
 t/030-add.t

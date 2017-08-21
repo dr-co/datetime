@@ -1,3 +1,9 @@
+libdr-datetime-perl (0.05) nowtaxi; urgency=medium
+
+  * Update depends list.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Mon, 21 Aug 2017 12:08:46 +0300
+
 libdr-datetime-perl (0.04) nowtaxi; urgency=medium
 
   * Nanosecond is an optional field.

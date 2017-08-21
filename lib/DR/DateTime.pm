@@ -4,10 +4,9 @@ use DR::DateTime::Defaults;
 use 5.010001;
 use strict;
 use warnings;
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 use Carp;
 
-use Data::Dumper ();
 use POSIX ();
 use Time::Local ();
 use Time::Zone ();
