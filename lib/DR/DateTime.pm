@@ -4,7 +4,7 @@ use DR::DateTime::Defaults;
 use 5.010001;
 use strict;
 use warnings;
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 use Carp;
 
 use POSIX ();
@@ -38,7 +38,7 @@ use overload
 
 
 sub new {
-    my ($self, $stamp, $tz) = @_;
+    my ($class, $stamp, $tz) = @_;
     $stamp //= time;
 
     if (defined $tz) {
@@ -54,7 +54,7 @@ sub new {
     $tz = $DR::DateTime::Defaults::TZFORCE
         if defined $DR::DateTime::Defaults::TZFORCE;
 
-    bless [ $stamp, $tz // () ] => ref($self) || $self;
+    bless [ $stamp, $tz // () ] => ref($class) || $class;
 }
 
 sub parse {
@@ -63,6 +63,10 @@ sub parse {
     my ($y, $m, $d, $H, $M, $S, $ns, $z);
 
     for ($str) {
+
+        if (/^\d+$/) {
+            return $class->new($str, $default_tz // '+0000');
+        }
         if (/^(\d{4})-(\d{2})-(\d{2})(?:\s+|T)(\d{2}):(\d{2}):(\d{2})(\.\d+)?\s*(\S+)?$/) {
             ($y, $m, $d, $H, $M, $S, $ns, $z) =
                 ($1, $2, $3, $4, $5, $6, $7, $8);

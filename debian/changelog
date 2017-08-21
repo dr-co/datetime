@@ -1,3 +1,9 @@
+libdr-datetime-perl (0.06) nowtaxi; urgency=medium
+
+  * Method 'parse' allows timestamp (uses +0000 zone).
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Mon, 21 Aug 2017 12:42:01 +0300
+
 libdr-datetime-perl (0.05) nowtaxi; urgency=medium
 
   * Update depends list.
