@@ -6,7 +6,7 @@ use utf8;
 use open qw(:std :utf8);
 use lib qw(lib ../lib t/lib);
 
-use Test::More tests    => 66;
+use Test::More tests    => 68;
 use Encode qw(decode encode);
 
 
@@ -141,4 +141,9 @@ for my $t (DR::DateTime->parse('2017-08-17')) {
     isa_ok $t => DR::DateTime::, 'parsed wo second';
     is $t->hour, 0, 'hour';
     is $t->minute, 0, 'minute';
+}
+
+for my $t (DR::DateTime->parse('21.08.2017 12:00:00 +0300')) {
+    isa_ok $t => DR::DateTime::, 'parsed real case';
+    is $t->hour, 12, 'hour';
 }

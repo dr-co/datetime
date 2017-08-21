@@ -4,7 +4,7 @@ use DR::DateTime::Defaults;
 use 5.010001;
 use strict;
 use warnings;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 use Carp;
 
 use Data::Dumper ();
@@ -82,7 +82,7 @@ sub parse {
             goto PARSED;
         }
 
-        if (/^(\d{1,2})\.(\d{1,2})\.(\d{4})\s+(\d{2}):(\d{2}):(\d{2})(\.\d+)\s*(\S+)?$/) {
+        if (/^(\d{1,2})\.(\d{1,2})\.(\d{4})\s+(\d{2}):(\d{2}):(\d{2})(\.\d+)?\s*(\S+)?$/) {
             ($y, $m, $d, $H, $M, $S, $ns, $z) =
                 ($3, $2, $1, $4, $5, $6, $7, $8);
             goto PARSED;

@@ -1,3 +1,9 @@
+libdr-datetime-perl (0.04) nowtaxi; urgency=medium
+
+  * Nanosecond is an optional field.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Mon, 21 Aug 2017 10:27:21 +0300
+
 libdr-datetime-perl (0.03) nowtaxi; urgency=medium
 
   * Add set_time_zone method.
