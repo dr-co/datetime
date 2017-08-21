@@ -1,3 +1,9 @@
+libdr-datetime-perl (0.07) nowtaxi; urgency=medium
+
+  * Overload cmp, <=> with numeric and string work properly.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Mon, 21 Aug 2017 18:45:21 +0300
+
 libdr-datetime-perl (0.06) nowtaxi; urgency=medium
 
   * Method 'parse' allows timestamp (uses +0000 zone).

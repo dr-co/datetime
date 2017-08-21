@@ -4,7 +4,7 @@ use DR::DateTime::Defaults;
 use 5.010001;
 use strict;
 use warnings;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 use Carp;
 
 use POSIX ();
@@ -20,7 +20,7 @@ use overload
             if ('DR::DateTime' eq ref $cv) {
                 return $self->fepoch <=> $cv->fepoch;
             }
-            return $self->fepoch <=> $cv->fepoch;
+            return $self->fepoch <=> $cv;
         },
 
         'cmp'       => sub {
