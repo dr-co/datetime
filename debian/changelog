@@ -1,3 +1,9 @@
+libdr-datetime-perl (0.09) nowtaxi; urgency=medium
+
+  * Drop debug warnings.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Wed, 23 Aug 2017 10:30:10 +0300
+
 libdr-datetime-perl (0.08) nowtaxi; urgency=medium
 
   * Overload '+', '-' operations. 

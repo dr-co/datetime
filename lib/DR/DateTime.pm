@@ -4,7 +4,7 @@ use DR::DateTime::Defaults;
 use 5.010001;
 use strict;
 use warnings;
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 use Carp;
 
 use POSIX ();
@@ -52,7 +52,6 @@ use overload
 
         '-'         => sub {
             my ($self, $cv, $flip) = @_;
-            warn "$self $cv $flip";
 
             if ($flip) {
                 if ('DR::DateTime' eq ref $cv) {
