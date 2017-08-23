@@ -4,13 +4,15 @@ use DR::DateTime::Defaults;
 use 5.010001;
 use strict;
 use warnings;
-our $VERSION = '0.09';
+our $VERSION = '1.00';
 use Carp;
 
 use POSIX ();
 use Time::Local ();
 use Time::Zone ();
 use feature 'state';
+
+sub TO_JSON { shift->strftime('%F %T%z') }  # JSON::XS compatible
 
 use overload
         'bool'      => sub { 1 },

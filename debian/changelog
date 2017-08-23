@@ -1,3 +1,9 @@
+libdr-datetime-perl (1.00) nowtaxi; urgency=medium
+
+  * The module is JSON::XS compatible.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Wed, 23 Aug 2017 12:41:05 +0300
+
 libdr-datetime-perl (0.09) nowtaxi; urgency=medium
 
   * Drop debug warnings.
